@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
@@ -64,9 +65,7 @@ public class MediatorImpl implements Mediator {
                         classes.add(clazz);
                     }
                 }
-            } catch (ClassNotFoundException e) {
-                //예외 무시
-            } catch (NoSuchMethodException e) {
+            } catch (ClassNotFoundException | NoSuchMethodException e) {
                 //예외 무시
             }
         }
@@ -85,10 +84,12 @@ public class MediatorImpl implements Mediator {
         try {
             Object instance = foundClass.getConstructor().newInstance();
             return (TResponse) foundMethod.invoke(instance, command);
-        } catch (Exception e) {
-            //예외 무시
+        } catch (NoSuchMethodException e) {
+            // 예외 무시
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            // 다양한 예외 상황에 대한 예외 처리
+            e.printStackTrace();
         }
-
 
         return null;
     }
